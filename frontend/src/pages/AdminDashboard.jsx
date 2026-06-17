@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AdminDashboard() {
   const [farmers, setFarmers] = useState([]);
   const [allocations, setAllocations] = useState([]);
@@ -40,22 +42,19 @@ const [allocationData, setAllocationData] = useState({
   });
 
   const fetchStats = () => {
-    axios
-      .get("http://localhost:8080/dashboard/stats")
+      axios.get(`${API_URL}/dashboard/stats`)
       .then((res) => setStats(res.data))
       .catch((err) => console.error(err));
   };
 
-  const fetchFarmers = () => {
-    axios
-      .get("http://localhost:8080/farmers")
+ const fetchFarmers = () => {
+  axios.get(`${API_URL}/farmers`)
       .then((res) => setFarmers(res.data))
       .catch((err) => console.error(err));
   };
 
-  const fetchAllocations = () => {
-    axios
-      .get("http://localhost:8080/seed-allocations")
+ const fetchAllocations = () => {
+  axios.get(`${API_URL}/seed-allocations`)
       .then((res) => setAllocations(res.data))
       .catch((err) => console.error(err));
   };
@@ -83,7 +82,7 @@ const [allocationData, setAllocationData] = useState({
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8080/farmers", {
+      await axios.post(`${API_URL}/farmers`, {
         ...form,
         age: Number(form.age),
         farm_size: Number(form.farm_size),
@@ -111,7 +110,7 @@ const [allocationData, setAllocationData] = useState({
 
   const markPaid = async (id) => {
     try {
-      await axios.put(`http://localhost:8080/farmers/${id}/payment`, {
+      await axios.put(`${API_URL}/farmers/${id}/payment`, {
         payment_status: "Paid",
       });
 
@@ -124,7 +123,7 @@ const [allocationData, setAllocationData] = useState({
 
   const approvePayment = async (id) => {
     try {
-      await axios.put(`http://localhost:8080/farmers/${id}/payment`, {
+      await axios.put(`${API_URL}/farmers/${id}/payment`, {
         payment_status: "Paid",
       });
 
@@ -137,7 +136,7 @@ const [allocationData, setAllocationData] = useState({
 
   const verifyFarmer = async (id) => {
     try {
-      await axios.put(`http://localhost:8080/farmers/${id}/verify`);
+      await axios.put(`${API_URL}/farmers/${id}/verify`);
 
       refreshData();
       alert("Farmer verified successfully");
@@ -148,7 +147,7 @@ const [allocationData, setAllocationData] = useState({
 
   const rejectFarmer = async (id) => {
     try {
-      await axios.put(`http://localhost:8080/farmers/${id}/reject`);
+      await axios.put(`${API_URL}/farmers/${id}/reject`);
 
       refreshData();
       alert("Farmer rejected successfully");
@@ -161,7 +160,7 @@ const [allocationData, setAllocationData] = useState({
     e.preventDefault();
 
     try {
-      await axios.put(`http://localhost:8080/farmers/${editingFarmer.ID}`, {
+      await axios.put(`${API_URL}/farmers/${editingFarmer.ID}`, {
         name: editingFarmer.name,
         contact: editingFarmer.contact,
         location: editingFarmer.location,
@@ -183,7 +182,7 @@ const [allocationData, setAllocationData] = useState({
 
   const allocateSeeds = async () => {
   try {
-    await axios.post("http://localhost:8080/seed-allocations", {
+   await axios.post(`${API_URL}/seed-allocations`, {
       farmer_id: selectedFarmer.ID,
       bags_allocated: Number(allocationData.bags_allocated),
       collection_center: allocationData.collection_center,
@@ -209,7 +208,7 @@ const [allocationData, setAllocationData] = useState({
   const markCollected = async (allocationId) => {
     try {
       await axios.put(
-        `http://localhost:8080/seed-allocations/${allocationId}/collect`
+        `${API_URL}/seed-allocations/${allocationId}/collect`
       );
 
       refreshData();

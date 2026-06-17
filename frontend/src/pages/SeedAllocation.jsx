@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function SeedAllocation() {
   const [farmers, setFarmers] = useState([]);
   const [allocations, setAllocations] = useState([]);
 
   const fetchFarmers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/farmers");
+      const res = await axios.get(`${API_URL}/farmers`);
       setFarmers(res.data);
     } catch (error) {
       console.error(error);
@@ -16,7 +18,7 @@ function SeedAllocation() {
 
   const fetchAllocations = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/seed-allocations");
+      const res = await axios.get(`${API_URL}/seed-allocations`);
       setAllocations(res.data);
     } catch (error) {
       console.error(error);
@@ -34,7 +36,7 @@ function SeedAllocation() {
 
   const allocateSeeds = async (id, farmSize) => {
     try {
-      await axios.post("http://localhost:8080/seed-allocations", {
+      await axios.post(`${API_URL}/seed-allocations`, {
         farmer_id: id,
         bags_allocated: farmSize * 2,
       });
@@ -49,7 +51,7 @@ function SeedAllocation() {
   const markCollected = async (allocationId) => {
     try {
       await axios.put(
-        `http://localhost:8080/seed-allocations/${allocationId}/collect`
+        `${API_URL}/seed-allocations/${allocationId}/collect`
       );
 
       alert("Seeds marked as collected");

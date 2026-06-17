@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function FarmerStatus() {
   const [idNumber, setIdNumber] = useState("");
   const [contact, setContact] = useState("");
@@ -14,8 +16,8 @@ function FarmerStatus() {
 
     try {
       const res = await axios.get(
-        `http://localhost:8080/farmers/status/check?id_number=${idNumber}&contact=${contact}`
-      );
+  `${API_URL}/farmers/status/check?id_number=${idNumber}&contact=${contact}`
+);
 
       setFarmer(res.data);
     } catch (err) {

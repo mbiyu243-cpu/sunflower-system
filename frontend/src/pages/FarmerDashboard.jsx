@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./FarmerDashboard.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function FarmerDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [farmer, setFarmer] = useState(null);
@@ -10,7 +12,7 @@ function FarmerDashboard() {
   useEffect(() => {
     if (user?.farmer_id) {
       axios
-        .get(`http://localhost:8080/farmer-dashboard/${user.farmer_id}`)
+        axios.get(`${API_URL}/farmer-dashboard/${user.farmer_id}`)
         .then((res) => setFarmer(res.data))
         .catch((err) => console.error(err));
     }
@@ -18,8 +20,8 @@ function FarmerDashboard() {
 
   const submitMpesaCode = async () => {
   try {
-    await axios.put(
-      `http://localhost:8080/farmers/${farmer.ID}/submit-mpesa-code`,
+    awaitaxios.put(
+  `${API_URL}/farmers/${farmer.ID}/submit-mpesa-code`,
       {
         mpesa_code: mpesaCode,
       }
@@ -27,9 +29,9 @@ function FarmerDashboard() {
 
     alert("Payment code submitted successfully");
 
-    const res = await axios.get(
-      `http://localhost:8080/farmer-dashboard/${user.farmer_id}`
-    );
+    const res = awaitaxios.get(
+  `${API_URL}/farmer-dashboard/${user.farmer_id}`
+)
 
     setFarmer(res.data);
     setMpesaCode("");

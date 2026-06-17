@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function FarmerRegister() {
   const navigate = useNavigate();
 
@@ -34,7 +36,7 @@ function FarmerRegister() {
       return;
     }
 
-    const res = await axios.post("http://localhost:8080/farmers", {
+   const res = await axios.post(`${API_URL}/farmers`, {
       name: form.name,
       id_number: form.id_number,
       contact: form.contact,
@@ -48,8 +50,8 @@ function FarmerRegister() {
     });
 
     await axios.put(
-      `http://localhost:8080/farmers/${res.data.ID}/simulate-payment`
-    );
+  `${API_URL}/farmers/${res.data.ID}/simulate-payment`
+);
 
     alert("Registration successful. You can now log in.");
 

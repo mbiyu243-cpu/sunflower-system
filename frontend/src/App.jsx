@@ -6,6 +6,7 @@ import FarmerStatus from "./pages/FarmerStatus";
 import Login from "./pages/Login";
 import FarmerDashboard from "./pages/FarmerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminChangePassword from "./pages/AdminChangePassword";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -51,6 +52,10 @@ function AppContent() {
                 Seed Allocation
               </Link>
 
+              <Link className="btn btn-outline-light btn-sm" to="/admin/change-password">
+  Change Password
+</Link>
+
               <button className="btn btn-dark btn-sm" onClick={logout}>
                 Logout
               </button>
@@ -92,6 +97,14 @@ function AppContent() {
 />
         <Route path="/farmer-status" element={<FarmerStatus />} />
         <Route path="/login" element={<Login />} />
+        <Route
+  path="/admin/change-password"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminChangePassword />
+    </ProtectedRoute>
+  }
+/>
         <Route
   path="/farmer-dashboard"
   element={

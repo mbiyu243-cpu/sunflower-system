@@ -53,6 +53,7 @@ func main() {
 
 	r.POST("/register-admin", handlers.RegisterAdmin)
 	r.POST("/login", handlers.Login)
+	r.PUT("/admin/change-password", handlers.ChangeAdminPassword)
 
 	r.GET("/farmer-dashboard/:id", handlers.GetFarmerDashboard)
 

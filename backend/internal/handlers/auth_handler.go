@@ -87,3 +87,39 @@ func Login(c *gin.Context) {
 	"farmer_id": user.FarmerID,
 })
 }
+
+func ChangeAdminPassword(c *gin.Context) {
+	var input struct {
+		Email           string `json:"email"`
+		CurrentPassword string `json:"current_password"`
+		NewPassword     string `json:"new_password"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user models.User
+
+	if err := config.DB.Where("email = ? AND role = ?", input.Email, "admin").First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Admin account not found"})
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.CurrentPassword)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Current password is incorrect"})
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
+	user.Password = string(hashedPassword)
+	config.DB.Save(&user)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
+}

@@ -79,6 +79,9 @@ function Login() {
                 <button className="btn btn-success w-100">
                   Login
                 </button>
+                <div className="text-center mt-3">
+  <a href="/forgot-password">Forgot password?</a>
+</div>
               </form>
             </div>
           </div>

@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import FarmerDashboard from "./pages/FarmerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminChangePassword from "./pages/AdminChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -79,6 +80,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<FarmerRegister />} />
         <Route path="/register" element={<FarmerRegister />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
   path="/admin"
   element={

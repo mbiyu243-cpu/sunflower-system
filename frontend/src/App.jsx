@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, Navigate } from "react-router-dom";
 import AdminDashboard from "./pages/AdminDashboard";
 import FarmerRegister from "./pages/FarmerRegister";
 import SeedAllocation from "./pages/SeedAllocation";
@@ -114,9 +114,11 @@ function AppContent() {
         <Route
   path="/officer/seed-collection"
   element={
-    <ProtectedRoute allowedRole="collection_officer">
+    user?.role === "admin" || user?.role === "collection_officer" ? (
       <SeedCollectionScanner />
-    </ProtectedRoute>
+    ) : (
+      <Navigate to="/login" />
+    )
   }
 />
         <Route

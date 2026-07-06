@@ -55,6 +55,10 @@ function AppContent() {
                 Seed Allocation
               </Link>
 
+              <Link className="btn btn-outline-light btn-sm" to="/officer/seed-collection">
+  Seed Collection
+</Link>
+
               <Link className="btn btn-outline-light btn-sm" to="/admin/change-password">
   Change Password
 </Link>

@@ -3,23 +3,30 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
+console.log("API_URL:", API_URL);
 
 function FarmerRegister() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    name: "",
-    id_number: "",
-    contact: "",
-    location: "",
-    age: "",
-    farm_size: "",
-    registration_fee: 1000,
-    payment_status: "Pending",
-    email: "",
-    password: "",
-    confirm_password: "",
-  });
+  name: "",
+  id_number: "",
+  contact: "",
+  location: "",
+  age: "",
+  farm_size: "",
+  registration_fee: 1000,
+  payment_status: "Pending",
+
+  payment_method: "Mpesa",
+  crypto_network: "TRON (TRC20)",
+  crypto_wallet_address: "TXYZ123456789ABCDEFG987654321", // Replace with your wallet
+  crypto_transaction_hash: "",
+
+  email: "",
+  password: "",
+  confirm_password: "",
+});
 
   const handleChange = (e) => {
     setForm({
@@ -37,21 +44,28 @@ function FarmerRegister() {
     }
 
    const res = await axios.post(`${API_URL}/farmers`, {
-      name: form.name,
-      id_number: form.id_number,
-      contact: form.contact,
-      location: form.location,
-      age: Number(form.age),
-      farm_size: Number(form.farm_size),
-      registration_fee: Number(form.registration_fee),
-      payment_status: form.payment_status,
-      email: form.email,
-      password: form.password,
-    });
+  name: form.name,
+  id_number: form.id_number,
+  contact: form.contact,
+  location: form.location,
+  age: Number(form.age),
+  farm_size: Number(form.farm_size),
+  registration_fee: Number(form.registration_fee),
 
-    await axios.put(
-  `${API_URL}/farmers/${res.data.ID}/simulate-payment`
-);
+  payment_status: form.payment_status,
+  payment_method: form.payment_method,
+
+  crypto_network: form.crypto_network,
+  crypto_wallet_address: form.crypto_wallet_address,
+  crypto_transaction_hash: form.crypto_transaction_hash,
+
+  email: form.email,
+  password: form.password,
+});
+
+    if (form.payment_method === "Mpesa") {
+  await axios.put(`${API_URL}/farmers/${res.data.ID}/simulate-payment`);
+}
 
     alert("Registration successful. You can now log in.");
 
@@ -78,7 +92,7 @@ function FarmerRegister() {
         <div className="col-md-7">
           <div className="card shadow-lg border-0">
             <div className="card-header bg-success text-white">
-              <h3 className="mb-0">🌻 Farmer Self Registration</h3>
+              <h3 className="mb-0">🌻 Farmer Self Registration </h3>
             </div>
 
             <div className="card-body">
@@ -200,6 +214,21 @@ function FarmerRegister() {
                   </div>
                 </div>
 
+<h5 className="mb-3">Payment Method</h5>
+
+<div className="mb-3">
+  <select
+    className="form-select"
+    name="payment_method"
+    value={form.payment_method}
+    onChange={handleChange}
+  >
+    <option value="Mpesa">M-Pesa</option>
+    <option value="Crypto">Crypto (USDT)</option>
+  </select>
+</div>
+
+{form.payment_method === "Mpesa" && (
                 <div className="alert alert-warning">
   <h5>📱 M-Pesa PayBill Payment</h5>
 
@@ -223,6 +252,44 @@ function FarmerRegister() {
     M-Pesa transaction code from your dashboard.
   </small>
 </div>
+)}
+
+{form.payment_method === "Crypto" && (
+  <div className="alert alert-info">
+
+    <h5>💰 Crypto Payment</h5>
+
+    <p>
+      <strong>Network:</strong> {form.crypto_network}
+    </p>
+
+    <p>
+      <strong>Wallet Address:</strong>
+    </p>
+
+    <input
+      className="form-control mb-3"
+      value={form.crypto_wallet_address}
+      readOnly
+    />
+
+    <label>Transaction Hash</label>
+
+    <input
+      className="form-control"
+      name="crypto_transaction_hash"
+      value={form.crypto_transaction_hash}
+      onChange={handleChange}
+      placeholder="Paste your transaction hash"
+      required
+    />
+
+    <small className="text-muted">
+      Your payment will be verified by the administrator before approval.
+    </small>
+
+  </div>
+)}
 
                 <button className="btn btn-success btn-lg w-100">
                   Register & Create Farmer Account

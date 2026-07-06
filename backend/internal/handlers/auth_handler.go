@@ -43,6 +43,37 @@ func RegisterAdmin(c *gin.Context) {
 	})
 }
 
+func RegisterOfficer(c *gin.Context) {
+	var input struct {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword(
+		[]byte(input.Password),
+		bcrypt.DefaultCost,
+	)
+
+	officer := models.User{
+		Name:     input.Name,
+		Email:    input.Email,
+		Password: string(hashedPassword),
+		Role:     "collection_officer",
+	}
+
+	config.DB.Create(&officer)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Collection officer created successfully",
+	})
+}
+
 func Login(c *gin.Context) {
 	var input struct {
 		Email    string `json:"email"`

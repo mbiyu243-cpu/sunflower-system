@@ -30,10 +30,12 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(res.data));
 
       if (res.data.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/farmer-dashboard");
-      }
+  navigate("/admin");
+} else if (res.data.role === "collection_officer") {
+  navigate("/admin/seed-collection");
+} else {
+  navigate("/farmer-dashboard");
+}
     } catch (err) {
       setError("Invalid email or password");
     }

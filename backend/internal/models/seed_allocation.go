@@ -10,6 +10,9 @@ type SeedAllocation struct {
 	Status           string `json:"status"`
 	CollectionStatus string `json:"collection_status"`
 
+	CollectedBy string `json:"collected_by"`
+    CollectedAt string `json:"collected_at"`
+
 	CollectionCenter string `json:"collection_center"`
 	CollectionDate   string `json:"collection_date"`
 }

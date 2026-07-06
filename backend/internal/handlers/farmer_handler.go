@@ -21,6 +21,11 @@ func CreateFarmer(c *gin.Context) {
 		RegistrationFee float64 `json:"registration_fee"`
 		PaymentStatus   string  `json:"payment_status"`
 
+		PaymentMethod         string `json:"payment_method"`
+        CryptoNetwork         string `json:"crypto_network"`
+        CryptoWalletAddress   string `json:"crypto_wallet_address"`
+        CryptoTransactionHash string `json:"crypto_transaction_hash"`
+
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -31,17 +36,29 @@ func CreateFarmer(c *gin.Context) {
 	}
 
 	farmer := models.Farmer{
-		Name:            input.Name,
-		IDNumber:        input.IDNumber,
-		Contact:         input.Contact,
-		Location:        input.Location,
-		Age:             input.Age,
-		FarmSize:        input.FarmSize,
-		RegistrationFee: input.RegistrationFee,
-		PaymentStatus:   input.PaymentStatus,
-		PaybillNumber:   "123456",
-        AccountNumber:   input.IDNumber,
-	}
+    Name:                  input.Name,
+    IDNumber:              input.IDNumber,
+    Contact:               input.Contact,
+    Location:              input.Location,
+    Age:                   input.Age,
+    FarmSize:              input.FarmSize,
+    RegistrationFee:       input.RegistrationFee,
+    PaymentStatus:         input.PaymentStatus,
+    PaybillNumber:         "123456",
+    AccountNumber:         input.IDNumber,
+
+    PaymentMethod:         input.PaymentMethod,
+    CryptoNetwork:         input.CryptoNetwork,
+    CryptoWalletAddress:   input.CryptoWalletAddress,
+    CryptoTransactionHash: input.CryptoTransactionHash,
+
+    CryptoPaymentStatus: func() string {
+        if input.PaymentMethod == "Crypto" {
+            return "Pending Confirmation"
+        }
+        return ""
+    }(),
+}
 
 	config.DB.Create(&farmer)
 
@@ -115,6 +132,11 @@ func UpdatePaymentStatus(c *gin.Context) {
 	}
 
 	farmer.PaymentStatus = request.PaymentStatus
+
+if farmer.PaymentMethod == "Crypto" && request.PaymentStatus == "Paid" {
+	farmer.CryptoPaymentStatus = "Approved"
+	farmer.VerificationStatus = "Verified"
+}
 
 	config.DB.Save(&farmer)
 
@@ -247,6 +269,11 @@ func CheckFarmerStatus(c *gin.Context) {
 		"seed_status":        seedStatus,
 		"bags_allocated":     bagsAllocated,
 		"collection_status":  collectionStatus,
+		"payment_method":           farmer.PaymentMethod,
+        "crypto_network":           farmer.CryptoNetwork,
+        "crypto_wallet_address":    farmer.CryptoWalletAddress,
+        "crypto_transaction_hash":  farmer.CryptoTransactionHash,
+        "crypto_payment_status":    farmer.CryptoPaymentStatus,
 	})
 }
 
@@ -294,7 +321,13 @@ func GetFarmerDashboard(c *gin.Context) {
 		"transaction_id":      farmer.TransactionID,
 		"seed_status":         seedStatus,
 		"bags_allocated":      bagsAllocated,
+		"allocation_id":       allocation.ID,
 		"collection_status":   collectionStatus,
+		"payment_method":      farmer.PaymentMethod,
+        "crypto_network":      farmer.CryptoNetwork,
+        "crypto_wallet_address":    farmer.CryptoWalletAddress,
+        "crypto_transaction_hash":  farmer.CryptoTransactionHash,
+        "crypto_payment_status":    farmer.CryptoPaymentStatus,
 	})
 }
 

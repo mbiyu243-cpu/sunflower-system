@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./FarmerDashboard.css";
+import { QRCodeCanvas } from "qrcode.react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,7 +13,7 @@ function FarmerDashboard() {
   useEffect(() => {
     if (user?.farmer_id) {
       axios
-        axios.get(`${API_URL}/farmer-dashboard/${user.farmer_id}`)
+        .get(`${API_URL}/farmer-dashboard/${user.farmer_id}`)
         .then((res) => setFarmer(res.data))
         .catch((err) => console.error(err));
     }
@@ -20,7 +21,7 @@ function FarmerDashboard() {
 
   const submitMpesaCode = async () => {
   try {
-    awaitaxios.put(
+    await axios.put(
   `${API_URL}/farmers/${farmer.ID}/submit-mpesa-code`,
       {
         mpesa_code: mpesaCode,
@@ -29,7 +30,7 @@ function FarmerDashboard() {
 
     alert("Payment code submitted successfully");
 
-    const res = awaitaxios.get(
+    const res = await axios.get(
   `${API_URL}/farmer-dashboard/${user.farmer_id}`
 )
 
@@ -204,91 +205,144 @@ function FarmerDashboard() {
                 <div className="col-md-6">
                   <p><strong>Farm Size:</strong> {farmer.farm_size}</p>
                   <p><strong>Registration Fee:</strong> KES {farmer.registration_fee}</p>
-                  <p><strong>M-Pesa Receipt:</strong> {farmer.mpesa_receipt || "Not available"}</p>
+                  {farmer.payment_method === "Mpesa" ? (
+  <p>
+    <strong>M-Pesa Receipt:</strong>{" "}
+    {farmer.mpesa_receipt || "Not available"}
+  </p>
+) : (
+  <p>
+    <strong>Crypto Payment:</strong>{" "}
+    <span className="badge bg-warning text-dark">
+      {farmer.crypto_payment_status}
+    </span>
+  </p>
+)}
                   <hr />
 
-<h5>📱 PayBill Payment</h5>
+{farmer.payment_method === "Crypto" ? (
+  <>
+    <h5>💰 Crypto Payment</h5>
 
-<p>
-  <strong>PayBill Number:</strong>{" "}
-  {farmer.paybill_number || "123456"}
-</p>
+    <p>
+      <strong>Network:</strong> {farmer.crypto_network}
+    </p>
 
-<p>
-  <strong>Account Number:</strong>{" "}
-  {farmer.account_number || farmer.id_number}
-</p>
+    <p>
+      <strong>Wallet Address:</strong> {farmer.crypto_wallet_address}
+    </p>
 
-<p>
-  <strong>Submitted Code:</strong>{" "}
-  {farmer.submitted_mpesa_code || "Not submitted"}
-</p>
+    <p>
+      <strong>Transaction Hash:</strong>{" "}
+      {farmer.crypto_transaction_hash || "Not submitted"}
+    </p>
 
-{farmer.collection_status === "Collected" ? (
-  <div className="alert alert-success">
-    Seeds collected successfully. Thank you for participating.
-  </div>
-) : farmer.seed_status === "Allocated" ? (
-  <div className="alert alert-primary">
-    Your seeds have been allocated. Please collect them from the assigned center.
-  </div>
-) : farmer.verification_status === "Verified" ? (
-  <div className="alert alert-success">
-    Your payment has been confirmed and your account is verified.
-  </div>
-) : farmer.submitted_mpesa_code ? (
-  <div className="alert alert-info">
-    Your M-Pesa code has been submitted and is awaiting admin confirmation.
-  </div>
+    <p>
+      <strong>Payment Status:</strong>{" "}
+      <span className="badge bg-warning text-dark">
+        {farmer.crypto_payment_status || "Pending Confirmation"}
+      </span>
+    </p>
+
+    {farmer.seed_status === "Allocated" && (
+      <button
+        className="btn btn-outline-success mt-3"
+        onClick={printAllocationSlip}
+      >
+        Print Allocation Slip
+      </button>
+    )}
+  </>
 ) : (
   <>
-    <input
-      type="text"
-      className="form-control mb-2"
-      placeholder="Enter M-Pesa Code"
-      value={mpesaCode}
-      onChange={(e) => setMpesaCode(e.target.value)}
-    />
+    <h5>📱 PayBill Payment</h5>
 
-    <button
-      className="btn btn-success"
-      onClick={submitMpesaCode}
-      disabled={!mpesaCode}
-    >
-      Submit Payment Code
-    </button>
+    <p>
+      <strong>PayBill Number:</strong>{" "}
+      {farmer.paybill_number || "123456"}
+    </p>
+
+    <p>
+      <strong>Account Number:</strong>{" "}
+      {farmer.account_number || farmer.id_number}
+    </p>
+
+    <p>
+      <strong>Submitted Code:</strong>{" "}
+      {farmer.submitted_mpesa_code || "Not submitted"}
+    </p>
+
+    {farmer.collection_status === "Collected" ? (
+      <div className="alert alert-success">
+        Seeds collected successfully.
+      </div>
+    ) : farmer.seed_status === "Allocated" ? (
+      <div className="alert alert-primary">
+        Your seeds have been allocated.
+      </div>
+    ) : farmer.verification_status === "Verified" ? (
+      <div className="alert alert-success">
+        Your payment has been confirmed.
+      </div>
+    ) : farmer.submitted_mpesa_code ? (
+      <div className="alert alert-info">
+        Your M-Pesa code has been submitted and is awaiting confirmation.
+      </div>
+    ) : (
+      <>
+        <input
+          type="text"
+          className="form-control mb-2"
+          placeholder="Enter M-Pesa Code"
+          value={mpesaCode}
+          onChange={(e) => setMpesaCode(e.target.value)}
+        />
+
+        <button
+          className="btn btn-success"
+          onClick={submitMpesaCode}
+          disabled={!mpesaCode}
+        >
+          Submit Payment Code
+        </button>
+      </>
+    )}
+
+    <p className="mt-3">
+      <strong>Collection Center:</strong>{" "}
+      {farmer.collection_center || "Nairobi Depot"}
+    </p>
+
+    <p>
+      <strong>Collection Date:</strong>{" "}
+      {farmer.collection_date || "2026-06-20"}
+    </p>
+
+    <p>
+      <strong>Transaction ID:</strong>{" "}
+      {farmer.transaction_id || "Not available"}
+    </p>
+
+    <p>
+      <strong>Collection Status:</strong>{" "}
+      <span
+        className={`badge ${
+          isCollected ? "bg-success" : "bg-warning text-dark"
+        }`}
+      >
+        {farmer.collection_status || "Pending"}
+      </span>
+    </p>
+
+    {farmer.seed_status === "Allocated" && (
+      <button
+        className="btn btn-outline-success mt-3"
+        onClick={printAllocationSlip}
+      >
+        Print Allocation Slip
+      </button>
+    )}
   </>
-)}
-
-<p>
-  <strong>Collection Center:</strong>{" "}
-  {farmer.collection_center || "Nairobi Depot"}
-</p>
-
-<p>
-  <strong>Collection Date:</strong>{" "}
-  {farmer.collection_date || "2026-06-20"}
-</p>
-
-                  <p><strong>Transaction ID:</strong> {farmer.transaction_id || "Not available"}</p>
-                  <p>
-  <strong>Collection Status:</strong>{" "}
-  <span
-    className={`badge ${
-      isCollected ? "bg-success" : "bg-warning text-dark"
-    }`}
-  >
-    {farmer.collection_status || "Pending"}
-  </span>
-</p>
-
-{farmer.seed_status === "Allocated" && (
-  <button
-    className="btn btn-outline-success mt-3"
-    onClick={printAllocationSlip}
-  >
-    Print Allocation Slip
-  </button>
 )}
                 </div>
               </div>
@@ -334,6 +388,20 @@ function FarmerDashboard() {
       <p>
         <strong>Note:</strong> Please carry your National ID when collecting seeds.
       </p>
+
+      <div className="text-center my-4">
+  <h5>Collection QR Code</h5>
+
+  <QRCodeCanvas
+  value={`ALLOC:${farmer.allocation_id}`}
+  size={220}
+  includeMargin={true}
+/>
+
+  <p className="text-muted mt-3">
+    Present this QR code at the collection centre.
+  </p>
+</div>
 
       <div className="mt-5 d-flex justify-content-between">
         <div>

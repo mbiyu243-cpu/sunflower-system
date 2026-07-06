@@ -8,6 +8,8 @@ import FarmerDashboard from "./pages/FarmerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminChangePassword from "./pages/AdminChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
+import SeedCollectionScanner from "./pages/SeedCollectionScanner";
+import CollectionOfficerDashboard from "./pages/CollectionOfficerDashboard";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -63,6 +65,22 @@ function AppContent() {
             </>
           )}
 
+          {user?.role === "collection_officer" && (
+  <>
+    <Link className="btn btn-outline-light btn-sm" to="/officer/dashboard">
+      Officer Dashboard
+    </Link>
+
+    <Link className="btn btn-outline-light btn-sm" to="/officer/seed-collection">
+      Seed Collection
+    </Link>
+
+    <button className="btn btn-dark btn-sm" onClick={logout}>
+      Logout
+    </button>
+  </>
+)}
+
           {user?.role === "farmer" && (
             <>
               <Link className="btn btn-light btn-sm" to="/farmer-dashboard">
@@ -90,6 +108,14 @@ function AppContent() {
   }
 />
         <Route
+  path="/officer/seed-collection"
+  element={
+    <ProtectedRoute allowedRole="collection_officer">
+      <SeedCollectionScanner />
+    </ProtectedRoute>
+  }
+/>
+        <Route
   path="/admin/seed-allocation"
   element={
     <ProtectedRoute allowedRole="admin">
@@ -112,6 +138,15 @@ function AppContent() {
   element={
     <ProtectedRoute allowedRole="farmer">
       <FarmerDashboard />
+    </ProtectedRoute>
+  }
+  />
+
+  <Route
+  path="/officer/dashboard"
+  element={
+    <ProtectedRoute allowedRole="collection_officer">
+      <CollectionOfficerDashboard />
     </ProtectedRoute>
   }
 />

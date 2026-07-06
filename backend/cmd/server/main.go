@@ -47,11 +47,13 @@ func main() {
 
 	r.POST("/seed-allocations", handlers.CreateSeedAllocation)
 	r.GET("/seed-allocations", handlers.GetSeedAllocations)
+	r.GET("/seed-allocations/:id/details", handlers.GetSeedAllocationDetails)
 	r.PUT("/seed-allocations/:id/collect", handlers.MarkSeedCollected)
 
 	r.GET("/dashboard/stats", handlers.GetDashboardStats)
 
 	r.POST("/register-admin", handlers.RegisterAdmin)
+	r.POST("/register-officer", handlers.RegisterOfficer)
 	r.POST("/login", handlers.Login)
 	r.PUT("/forgot-password", handlers.ForgotPassword)
 	r.PUT("/admin/change-password", handlers.ChangeAdminPassword)

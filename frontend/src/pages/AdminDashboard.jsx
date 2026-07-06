@@ -460,7 +460,9 @@ const [allocationData, setAllocationData] = useState({
                   <th>Location</th>
                   <th>Farm Size</th>
                   <th>Payment</th>
+                  <th>Method</th>
                   <th>M-Pesa Code</th>
+                  <th>Crypto Hash</th>
                   <th>Verification</th>
                   <th>Seed Status</th>
                   <th>Collection</th>
@@ -516,6 +518,11 @@ const [allocationData, setAllocationData] = useState({
                           {farmer.payment_status || "Pending"}
                         </span>
                       </td>
+                      <td>
+  <span className="badge bg-primary">
+    {farmer.payment_method || "Mpesa"}
+  </span>
+</td>
 
                       <td>
                         {farmer.submitted_mpesa_code ? (
@@ -526,6 +533,21 @@ const [allocationData, setAllocationData] = useState({
                           <span className="text-muted">-</span>
                         )}
                       </td>
+                      <td>
+  {farmer.payment_method === "Crypto" ? (
+    farmer.crypto_transaction_hash ? (
+      <span className="badge bg-info text-dark">
+        {farmer.crypto_transaction_hash.substring(0, 12)}...
+      </span>
+    ) : (
+      <span className="text-warning">
+        Waiting
+      </span>
+    )
+  ) : (
+    "-"
+  )}
+</td>
 
                       <td>
                         <span
@@ -573,66 +595,63 @@ const [allocationData, setAllocationData] = useState({
                       </td>
 
                       <td>
-                        {farmer.payment_status === "Pending Confirmation" &&
-                          farmer.submitted_mpesa_code && (
-                            <button
-                              className="btn btn-success btn-sm me-2 mb-1"
-                              onClick={() => approvePayment(farmer.ID)}
-                            >
-                              Approve Payment
-                            </button>
-                          )}
+  {/* M-Pesa farmers */}
+  {farmer.payment_method === "Mpesa" &&
+    farmer.payment_status === "Pending Confirmation" &&
+    farmer.submitted_mpesa_code && (
+      <>
+        <button
+          className="btn btn-success btn-sm me-2 mb-1"
+          onClick={() => approvePayment(farmer.ID)}
+        >
+          Approve M-Pesa
+        </button>
 
-                        {farmer.payment_status !== "Paid" &&
-                          farmer.payment_status !== "Pending Confirmation" && (
-                            <button
-                              className="btn btn-warning btn-sm me-2 mb-1"
-                              onClick={() => markPaid(farmer.ID)}
-                            >
-                              Mark Paid
-                            </button>
-                          )}
+        <button
+          className="btn btn-danger btn-sm mb-1"
+          onClick={() => rejectFarmer(farmer.ID)}
+        >
+          Reject
+        </button>
+      </>
+  )}
 
-                        {farmer.verification_status === "Verified" ? (
-                          <span className="badge bg-success me-2 mb-1">
-                            Verified
-                          </span>
-                        ) : farmer.verification_status === "Rejected" ? (
-                          <span className="badge bg-danger me-2 mb-1">
-                            Rejected
-                          </span>
-                        ) : (
-                          <>
-                            <button
-                              className="btn btn-success btn-sm me-2 mb-1"
-                              onClick={() => verifyFarmer(farmer.ID)}
-                            >
-                              Verify
-                            </button>
+  {/* Crypto farmers */}
+  {farmer.payment_method === "Crypto" &&
+    farmer.payment_status !== "Paid" && (
+      <>
+        <button
+          className="btn btn-success btn-sm me-2 mb-1"
+          onClick={() => approvePayment(farmer.ID)}
+        >
+          Approve Crypto
+        </button>
 
-                            <button
-                              className="btn btn-danger btn-sm me-2 mb-1"
-                              onClick={() => rejectFarmer(farmer.ID)}
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
+        <button
+          className="btn btn-danger btn-sm mb-1"
+          onClick={() => rejectFarmer(farmer.ID)}
+        >
+          Reject
+        </button>
+      </>
+  )}
 
-                        {farmer.payment_status === "Paid" &&
-                          farmer.verification_status === "Verified" &&
-                          !allocation && (
-                            <button
-  className="btn btn-info btn-sm me-2 mb-1"
-  onClick={() => {
-    setSelectedFarmer(farmer);
-    setShowAllocationForm(true);
-  }}
->
-  Allocate Seeds
-</button>
-                          )}
+  {/* Allocate Seeds */}
+  {farmer.payment_status === "Paid" &&
+    farmer.verification_status === "Verified" &&
+    !allocation && (
+      <button
+        className="btn btn-info btn-sm me-2 mb-1"
+        onClick={() => {
+          setSelectedFarmer(farmer);
+          setShowAllocationForm(true);
+        }}
+      >
+        Allocate Seeds
+      </button>
+  )}
 
+  {/* Mark Collected */}
                         {allocation &&
                           allocation.collection_status !== "Collected" && (
                             <button
@@ -649,7 +668,7 @@ const [allocationData, setAllocationData] = useState({
 
                 {filteredFarmers.length === 0 && (
                   <tr>
-                    <td colSpan="13" className="text-center text-muted">
+                    <td colSpan="15" className="text-center text-muted">
                       No farmers registered yet.
                     </td>
                   </tr>
